@@ -3,6 +3,7 @@
 The DAVIS (Dominant Activation and Variance for Increased Separation) method is based on two simple yet powerful observations about how neural networks process in-distribution (ID) vs. out-of-distribution (OOD) data at the feature level:
  - Higher Maximums for ID Samples: The peak (maximum) activation value within a feature map is consistently higher for in-distribution images than for out-of-distribution ones.
  - Higher Variance for ID Samples: Activations for ID images are often more "spiky" and concentrated, resulting in higher channel-wise variance. OOD images tend to produce flatter, more uniform activations with lower variance.
+
 DAVIS leverages these two statistical signals—maximum and variance—to create a feature representation that dramatically improves OOD detection.
 
 ## Models
@@ -87,50 +88,45 @@ datasets/
 ## Evaluation
 Before running the evaluation make sure to run following scripts for respective models and dataset pair. These scripts are inside `scripts/statistics.sh` and `scripts/precompute.sh`
 ```bash
-  python3 Statistics.py \
-  --in-dataset ImageNet-1K \
-  --id_loc datasets/in-imagenet/val \
-  --ood_loc datasets/ood-imagenet/ \
-  --model resnet_imagenet50 \
+python3 Statistics.py \
+ --batch-size 256 \
+ --in-dataset ImageNet-1K \
+ --id_loc datasets/in-imagenet/val \
+ --ood_loc datasets/ood-imagenet/ \
+ --model densenet121_imagenet \
 ```
 ```bash
 python3 precompute.py \
- --pool avg \
- --model densenet101 \
- --id_loc datasets/in/ \
- --in-dataset CIFAR-10 \
+ --in-dataset ImageNet-1K  \
+ --model densenet121_imagenet \
+ --id_loc datasets/in-imagenet/val \
 ```
-To evaluate OOD detection on CIFAR-10, run the following script:
+To evaluate OOD detection run the following script:
 ``` sh ./scripts/eval.sh ```
 This script internally executes, the model and evaluation methods can be modified as needed.
 ```bash
 python3 eval_ood.py \
-    --score energy \
-    --batch-size 64 \
-    --model densenet101 \
-    --id_loc datasets/in/ \
-    --in-dataset CIFAR-10 \
-    --ood_loc datasets/ood/ \
-    --ood_scale_type avg \
-    --scale_threshold 0.1 \
-    --ood_eval_type adaptive \
-    --threshold 1.0 \
-    --ood_eval_method <methods> 
+ --score energy \
+ --batch-size 64 \
+ --model densenet121_imagenet \
+ --id_loc datasets/in-imagenet/val \
+ --in-dataset ImageNet-1K \
+ --ood_loc datasets/ood-imagenet/ \
+ --ood_eval_type <ood_eval_type> \
+ --ash_p 90 \
+ --std 0.5 \
+ --ood_eval_method <ood_eval_method>
 ``` 
-### ImageNet Benchmark
-To evaluate OOD detection on ImageNet, run: `sh ./scripts/eval_imagenet.sh` which internally executes:  
-```bash
-python3 eval_ood.py \
-    --score energy \
-    --batch-size 64 \
-    --model mobilenetv2_imagenet \
-    --id_loc datasets/in-imagenet/val \
-    --in-dataset ImageNet-1K \
-    --ood_loc datasets/ood-imagenet/ \
-    --ood_scale_type avg \
-    --scale_threshold 0.1 \
-    --ood_eval_type adaptive \
-    --threshold 1.0 \
-    --ood_eval_method <methods> 
-```
-Model and evaluation methods can be updated accordingly by compatible techniques MSP, Energy, ReAct, ASH, DICE. `ood_eval_type=adaptive` represents the elastic scaling and `ood_eval_type=standard` represents standard evaluation with out the scaling mechanism. Details of the hyper-parameter is presented in the supplementary material. In this repo, `scripts/<datasets>/<methods>/<techniques>/experiment.sh` has details of all the experiment we run for OOD detection.
+			
+
+## Command Line Arguments
+
+| Argument           | Options                   | Description                                                                 |
+|--------------------|---------------------------|-----------------------------------------------------------------------------|
+| `--ood_eval_type`  | `avg`, `max`, `avg+std`  | Specifies the feature type. `avg` is the baseline (GAP). `max` and `avg+std` are our DAVIS variants. |
+| `--ood_eval_method`| `none`, `react`, `ash`, `dice` | The post-hoc baseline method to apply on top of the features from `--ood_eval_type`. |
+| `--std`            | *(float)*                | The hyperparameter γ for our `avg+std` method. Only used when `--ood_eval_type` is `avg+std`. |
+| `--ash_p`          | *(int)*                  | The percentile hyperparameter for the ASH baseline. Only used when `--ood_eval_method` is `ash`. |
+
+
+Model and evaluation methods can be updated accordingly by compatible techniques MSP, Energy, ReAct, ASH, DICE, SCALE. 
