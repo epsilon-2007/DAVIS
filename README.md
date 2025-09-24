@@ -112,10 +112,10 @@ python3 eval_ood.py \
  --id_loc datasets/in-imagenet/val \
  --in-dataset ImageNet-1K \
  --ood_loc datasets/ood-imagenet/ \
- --ood_eval_type <ood_eval_type> \
+ --ood_eval_type <eval_type> \
  --ash_p 90 \
  --std 0.5 \
- --ood_eval_method <ood_eval_method>
+ --ood_eval_method <eval_method>
 ``` 
 			
 
@@ -123,9 +123,9 @@ python3 eval_ood.py \
 
 | Argument           | Options                   | Description                                                                 |
 |--------------------|---------------------------|-----------------------------------------------------------------------------|
-| `--ood_eval_type`  | `avg`, `max`, `avg+std`  | Specifies the feature type. `avg` is the baseline (GAP). `max` and `avg+std` are our DAVIS variants. |
-| `--ood_eval_method`| `none`, `react`, `ash`, `dice` | The post-hoc baseline method to apply on top of the features from `--ood_eval_type`. |
-| `--std`            | *(float)*                | The hyperparameter γ for our `avg+std` method. Only used when `--ood_eval_type` is `avg+std`. |
+| `eval_type`  | `avg`, `max`, `avg+std`  | Specifies the feature type. `avg` is the baseline (GAP). `max` and `avg+std` are our DAVIS variants. |
+| `eval_method`| `baseline/energy`,`SCALE`, `ReAct`, `ASH`, `DICE` | The post-hoc baseline method to apply on top of the features from `--ood_eval_type`. |
+| `--std`            | *(float)*                | The hyperparameter `\gamma` for our `avg+std` method. Only used when `--ood_eval_type` is `avg+std`. |
 | `--ash_p`          | *(int)*                  | The percentile hyperparameter for the ASH baseline. Only used when `--ood_eval_method` is `ash`. |
 
 
