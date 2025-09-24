@@ -123,10 +123,10 @@ python3 eval_ood.py \
 
 | Argument           | Options                   | Description                                                                 |
 |--------------------|---------------------------|-----------------------------------------------------------------------------|
-| `eval_type`  | `avg`, `max`, `avg+std`  | Specifies the feature type. `avg` is the baseline (GAP). `max` and `avg+std` are our DAVIS variants. |
-| `eval_method`| `baseline/energy`,`SCALE`, `ReAct`, `ASH`, `DICE` | The post-hoc baseline method to apply on top of the features from `--ood_eval_type`. |
-| `--std`            | *(float)*                | The hyperparameter `\gamma` for our `avg+std` method. Only used when `--ood_eval_type` is `avg+std`. |
-| `--ash_p`          | *(int)*                  | The percentile hyperparameter for the ASH baseline. Only used when `--ood_eval_method` is `ash`. |
+| `--eval_type`  | `avg`, `max`, `avg+std`  | Specifies the feature type. `avg` is the baseline (GAP). `max` and `avg+std` are our DAVIS variants. |
+| `--eval_method`| `baseline/energy`,`SCALE`, `ReAct`, `ASH`, `DICE` | The post-hoc baseline method to apply on top of the features from `--ood_eval_type`. |
+| `--std`            | *(float)*                | The hyperparameter γ for our `avg+std` method. Only used when `--eval_type` is `avg+std`. |
+| `--ash_p`          | *(int)*                  | The percentile hyperparameter for the ASH baseline. Only used when `--eval_method` is `ash`. |
 
 
-Model and evaluation methods can be updated accordingly by compatible techniques MSP, Energy, ReAct, ASH, DICE, SCALE. 
+All experiments details are inside `scripts\<model_name>`
