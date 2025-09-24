@@ -1,12 +1,13 @@
-# DAVIS : Dominant Activations and Variance for Improved Separation
+# Catalyst: Out-of-Distribution Detection via Elastic Scaling
+
 In this paper, we make two additional key observations: (i) Most OOD samples exhibit a more uniform distribution within each channel compared to ID samples, i.e., the within-channel variance is typically higher for ID samples. (ii) The dominant (maximum) values within each channel are generally higher for ID samples than for OOD samples.
 
 ## Models
 
 ### Models on CIFAR Benchmark
-The model used for ResNet-18, ResNet-34 and DenseNet-101 in this project are already provided as checkpoints inside `models/checkpoints/resnet18` , `models/checkpoints/resnet34`, and `models/checkpoints/densenet101`.
+The model used for ResNet-18, ResNet-34, DenseNet-101 and MobileNet-v2 in this project are already provided as checkpoints inside `experiments/checkpoints/resnet18` , `experiments/checkpoints/resnet34`, `experiments/checkpoints/densenet101` and `experiments/checkpoints/mobilenetv2`.
 ### Pre-trained Model on ImageNet Benchmark
-We use pre-trained models — ResNet-34, ResNet-50, and MobileNet-v2 — provided by PyTorch. These models are automatically downloaded at the start of the evaluation process. Additionally, all necessary checkpoints required for successful evaluation have been uploaded and are readily available.
+We use pre-trained models — DenseNet-121, ResNet-50, MobileNet-v2, EfficientNet-b0 — provided by PyTorch. These models are automatically downloaded at the start of the evaluation process, when the parameter `pre-trained` is set to `False`.
 
 
 
@@ -80,38 +81,53 @@ datasets/
 ```
 
 
-
-
 ## Evaluation
-### CIFAR Benchmark
+Before running the evaluation make sure to run following scripts for respective models and dataset pair. These scripts are inside `scripts/statistics.sh` and `scripts/precompute.sh`
+```bash
+  python3 Statistics.py \
+  --in-dataset ImageNet-1K \
+  --id_loc datasets/in-imagenet/val \
+  --ood_loc datasets/ood-imagenet/ \
+  --model resnet_imagenet50 \
+```
+```bash
+python3 precompute.py \
+ --pool avg \
+ --model densenet101 \
+ --id_loc datasets/in/ \
+ --in-dataset CIFAR-10 \
+```
 To evaluate OOD detection on CIFAR-10, run the following script:
 ``` sh ./scripts/eval.sh ```
 This script internally executes, the model and evaluation methods can be modified as needed.
 ```bash
 python3 eval_ood.py \
-    --p 85 \
-    --pool avg \
     --score energy \
+    --batch-size 64 \
     --model densenet101 \
-    --embedding_dim 342 \
     --id_loc datasets/in/ \
     --in-dataset CIFAR-10 \
     --ood_loc datasets/ood/ \
-    --ood_eval_method DomAct
+    --ood_scale_type avg \
+    --scale_threshold 0.1 \
+    --ood_eval_type adaptive \
+    --threshold 1.0 \
+    --ood_eval_method <methods> 
 ``` 
 ### ImageNet Benchmark
 To evaluate OOD detection on ImageNet, run: `sh ./scripts/eval_imagenet.sh` which internally executes:  
 ```bash
 python3 eval_ood.py \
-    --ash_p 90 \
-    --pool avg \
     --score energy \
     --batch-size 64 \
-    --model resnet_imagenet50 \
-    --embedding_dim 2048 \
+    --model mobilenetv2_imagenet \
     --id_loc datasets/in-imagenet/val \
     --in-dataset ImageNet-1K \
     --ood_loc datasets/ood-imagenet/ \
-    --ood_eval_method DomAct
+    --ood_scale_type avg \
+    --scale_threshold 0.1 \
+    --ood_eval_type adaptive \
+    --threshold 1.0 \
+    --ood_eval_method <methods> 
 ```
-Model and evaluation methods can be updated accordingly. `DomAct` represents our methods that can be combined with existing techniques as outline in paper. Details of the hyper-parameter is detailed in the paper. In this repo, `experiment/` has details of all the experiment we run for OOD detection.
+Model and evaluation methods can be updated accordingly by compatible techniques MSP, Energy, ReAct, ASH, DICE. `ood_eval_type=adaptive` represents the elastic scaling and `ood_eval_type=standard` represents standard evaluation with out the scaling mechanism. Details of the hyper-parameter is presented in the supplementary material. In this repo, `scripts/<datasets>/<methods>/<techniques>/experiment.sh` has details of all the experiment we run for OOD detection.
