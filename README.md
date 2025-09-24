@@ -1,6 +1,9 @@
-# Catalyst: Out-of-Distribution Detection via Elastic Scaling
+# DAVIS: Out-of-distribution Detection via Dominant Activation and Variance for Increased Separation
 
-In this paper, we make two additional key observations: (i) Most OOD samples exhibit a more uniform distribution within each channel compared to ID samples, i.e., the within-channel variance is typically higher for ID samples. (ii) The dominant (maximum) values within each channel are generally higher for ID samples than for OOD samples.
+The DAVIS (Dominant Activation and Variance for Increased Separation) method is based on two simple yet powerful observations about how neural networks process in-distribution (ID) vs. out-of-distribution (OOD) data at the feature level:
+ - Higher Maximums for ID Samples: The peak (maximum) activation value within a feature map is consistently higher for in-distribution images than for out-of-distribution ones.
+ - Higher Variance for ID Samples: Activations for ID images are often more "spiky" and concentrated, resulting in higher channel-wise variance. OOD images tend to produce flatter, more uniform activations with lower variance.
+DAVIS leverages these two statistical signals—maximum and variance—to create a feature representation that dramatically improves OOD detection.
 
 ## Models
 
